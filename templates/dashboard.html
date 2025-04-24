@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام التحكم الذكي - ستاديوم جو</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #2A2F4F;
+      --secondary: #4CAF50;
+      --accent: #FF5722;
+      --bg-gradient: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%);
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --text: #FFFFFF;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Tajawal', sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: transform 0.3s ease;
+      min-height: 400px;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header i {
+      font-size: 1.5rem;
+      color: var(--secondary);
+    }
+
+    .visualization {
+      width: 100%;
+      height: 250px;
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .map-container {
+      height: 100%;
+      background: #111;
+      border-radius: 15px;
+      position: relative;
+    }
+
+    .bin-marker {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid white;
+      position: absolute;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .bin-marker:hover {
+      transform: scale(1.2);
+    }
+
+    .alert-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 30px;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .data-panel {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+    }
+
+    .status-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+      }
+
+      .card {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header style="text-align: center; padding: 2rem 0;">
+    <h1 style="font-size: 2rem; margin-bottom: 0.5rem;">🧭 لوحة التحكم الذكية</h1>
+    <p style="color: rgba(255,255,255,0.8);">مراقبة حية لجميع عمليات الاستاد</p>
+  </header>
+
+  <main class="dashboard">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-users"></i>
+        <h2>مراقبة الحشود</h2>
+      </div>
+        <h3>مدخل الشرقي</h3>
+
+      <div class="visualization">
+        <img id="crowdView" src="/video_feed1" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;" />
+
+      </div>
+      <div class="data-panel">
+        <div class="status-item">
+          <span>المدخل الحالي :</span>
+          <span id="crowdDensity">مزدحم</span>
+        </div>
+        <div class="status-item">
+          <span>المدخل الغربي :</span>
+          <span>غير مزدحم</span>
+        </div>
+        <div class="status-item">
+          <span>المدخل الشمالي:</span>
+          <span>غير مزدحم</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-heartbeat"></i>
+        <h2>المراقبة الصحية</h2>
+      </div>
+      <div class="visualization">
+        <img id="thermalCam" src="/video_feed2" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;" />
+        <div class="alert-badge" id="healthAlert">⚠️ حالة طارئة</div>
+      </div>
+      <div class="data-panel">
+        <div class="status-item">
+          <span>عدد المصابين:</span>
+          <span id="activeCases">1</span>
+        </div>
+        <div class="status-item">
+          <span>الهوية :</span>
+          <span id="activeCasess">112548</span>
+        </div>
+        <div class="status-item">
+          <span>رقم المقعد :</span>
+          <span id="activeCasees">45</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-trash-alt"></i>
+        <h2>إدارة النفايات</h2>
+      </div>
+      <div class="visualization">
+        <img src="https://i.ibb.co/gLfS2LDW/asas.png" alt="خريطة الملعب" style="width:100%; height:100%; object-fit: cover; border-radius: 15px; position: relative;">
+        <div class="bin-marker" style="top: 10%; left: 40%; background: #4CAF50; position: absolute;"></div>
+        <div class="bin-marker" style="top: 60%; left: 70%; background: #FF9800; position: absolute;"></div>
+        <div class="bin-marker" style="top: 45%; left: 20%; background: #F44336; position: absolute;"></div>
+      </div>
+      <div class="data-panel">
+        <div class="status-item">
+          <span>الصناديق الممتلئة:</span>
+          <span id="fullBins">1</span>
+        </div>
+        <div class="status-item">
+          <span>صندوق 1:</span>
+          <span id="bin1Percent">20%</span>
+        </div>
+        <div class="status-item">
+          <span>صندوق 2:</span>
+          <span id="bin2Percent">65%</span>
+        </div>
+        <div class="status-item">
+          <span>صندوق 3:</span>
+          <span id="bin3Percent">90%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-door-open"></i>
+        <h2>نظام الدخول الذكي</h2>
+      </div>
+      <div class="visualization">
+
+        <img id="entryCam" src="/video_feed3" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;" />
+
+      </div>
+      <div class="data-panel">
+        <div class="status-item">
+          <span>البوابة:</span>
+          <span id="entriesPerMin">الشرقية </span>
+
+        </div>
+        <div class="status-item">
+          <span>سجل الدخول :</span>
+          <span id="entriesPerMinN">0 </span>
+        </div>
+      </div>
+    </div>
+      <div class="card">
+      <div class="card-header">
+        <i class="fas fa-user-shield"></i>
+        <h2>مراقبة المشاجرات</h2>
+      </div>
+      <div class="visualization">
+        <img id="conflictCam" src="/video_feed4" style="width: 100%; height: 100%; object-fit: cover; border-radius: 15px;" />
+
+        <div class="alert-badge" id="conflictAlert">⚠️ اشتباه بمشاجرة</div>
+      </div>
+      <div class="data-panel">
+        <div class="status-item">
+          <span>عدد التنبيهات:</span>
+          <span id="conflictCount">0</span>
+        </div>
+        <div class="status-item">
+          <span>آخر موقع:</span>
+          <span id="conflictZone">لا يوجد</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const socket = new WebSocket('wss://your-api-endpoint');
+    socket.addEventListener('message', (event) => {
+      const data = JSON.parse(event.data);
+      updateDashboard(data);
+    });
+
+    function updateDashboard(data) {
+      document.getElementById('crowdDensity').textContent = `${Math.round(data.crowd.density * 100)}%`;
+      document.getElementById('activeCases').textContent = data.health.active_cases;
+      document.getElementById('fullBins').textContent = data.waste.full_bins;
+      document.getElementById('entriesPerMin').textContent = data.entries.per_minute;
+      document.getElementById('conflictCount').textContent = data.conflict.count;
+      document.getElementById('conflictZone').textContent = data.conflict.zone;
+    }%`;
+      document.getElementById('activeCases').textContent = data.health.active_cases;
+      document.getElementById('fullBins').textContent = data.waste.full_bins;
+      document.getElementById('entriesPerMin').textContent = data.entries.per_minute;
+    }
+
+    setInterval(() => {
+      const mockData = {
+        crowd: { density: Math.random() },
+        health: { active_cases: Math.floor(Math.random() * 10) },
+        waste: { full_bins: Math.floor(Math.random() * 5) },
+        entries: { per_minute: Math.floor(Math.random() * 100) },
+        conflict: {
+          count: Math.floor(Math.random() * 3),
+          zone: ['المنطقة الغربية', 'المدخل الشمالي', 'المدرج الأوسط'][Math.floor(Math.random() * 3)]
+        }
+      };
+      updateDashboard(mockData);
+    }, 3000);
+    navigator.mediaDevices.enumerateDevices()
+    .then(devices => {
+      const videoDevices = devices.filter(device => device.kind === 'videoinput');
+
+      if (videoDevices.length < 4) {
+        alert(`⚠️ جهازك يحتوي فقط على ${videoDevices.length} كاميرا${videoDevices.length === 1 ? '' : 'ت'} متصلة.`);
+        return;
+      }
+
+      const videoIds = ['crowdView', 'thermalCam', 'entryCam', 'conflictCam'];
+
+      for (let i = 0; i < 4; i++) {
+        navigator.mediaDevices.getUserMedia({ video: { deviceId: videoDevices[i].deviceId }, audio: false })
+          .then(stream => {
+            const videoElement = document.getElementById(videoIds[i]);
+            if (videoElement) {
+              videoElement.srcObject = stream;
+            }
+          })
+          .catch(err => {
+            console.error(`🚫 تعذر تشغيل الكاميرا رقم ${i + 1}:`, err);
+          });
+      }
+    })
+    .catch(err => {
+      console.error('🚫 خطأ في الوصول إلى الأجهزة:', err);
+      alert("⚠️ لم يتم منح الإذن للوصول إلى الكاميرات.");
+    });
+  </script>
+</body>
+</html>
